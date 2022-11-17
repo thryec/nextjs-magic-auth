@@ -2,9 +2,10 @@ import Wallet from '../components/Wallet'
 
 const Home = () => {
   return (
-    <div className="text-2xl">
-      hello world
-      <Wallet />
+    <div className="flex justify-center">
+      <div className="mt-20">
+        <Wallet />
+      </div>
     </div>
   )
 }
