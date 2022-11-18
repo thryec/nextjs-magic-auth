@@ -7,6 +7,7 @@ const Wallet = () => {
   const [magic, setMagic] = useState<any>()
   const [provider, setProvider] = useState<any>()
   const [loggedIn, setLoggedIn] = useState<boolean>(false)
+  const [signature, setSignature] = useState<string>()
 
   useEffect(() => {
     const magic = new Magic('pk_live_13D0E3B027EC589E')
@@ -20,7 +21,7 @@ const Wallet = () => {
   const checkStatus = async () => {
     try {
       const isLoggedIn = await magic.user.isLoggedIn()
-      console.log(isLoggedIn)
+      console.log('user login status: ', isLoggedIn)
       setLoggedIn(isLoggedIn)
     } catch {
       console.log('error retrieving status')
@@ -30,7 +31,7 @@ const Wallet = () => {
   const logout = async () => {
     try {
       await magic.user.logout()
-      console.log(await magic.user.isLoggedIn()) // => `false`
+      console.log('user logout status:', await magic.user.isLoggedIn()) // => `false`
       setLoggedIn(await magic.user.isLoggedIn())
     } catch {
       console.log('error logging out')
@@ -52,9 +53,30 @@ const Wallet = () => {
     }
   }
 
+  const sendTransaction = async () => {
+    const signer = await provider.getSigner()
+    const tx = signer.sendTransaction({
+      to: '0x4C36B84b2974604e0fEA458198F30864a70481E0',
+      value: ethers.utils.parseEther('0.01'),
+    })
+  }
+
+  const signMessage = async () => {
+    try {
+      console.log('signing...')
+      const signer = await provider.getSigner()
+      const msg = 'hello world'
+      let signature = await signer.signMessage(msg)
+      setSignature(signature)
+      console.log('signature', signature)
+    } catch (err) {
+      console.log('error: ', err)
+    }
+  }
+
   return (
     <div className="space-y-6">
-      <h1 className="text-center text-2xl">Magic Wallet</h1>
+      <h1 className="text-center text-2xl mb-4">Magic Wallet</h1>
       {loggedIn ? (
         <span onClick={() => logout()}>Logout</span>
       ) : (
@@ -72,9 +94,30 @@ const Wallet = () => {
           Email Login
         </button>
       </div>
+      <div>
+        <input
+          type="text"
+          className="border-2 block mb-2 rounded-md px-2 py-1"
+        />
+        <button className="rounded-md bg-blue-500 text-white px-4 py-1">
+          SMS Login
+        </button>
+      </div>
+      <div>
+        <button
+          onClick={() => signMessage()}
+          className="rounded-md bg-blue-500 text-white px-4 py-1"
+        >
+          Sign Message
+        </button>
+        {signature && <span className="block">{signature}</span>}
+      </div>
 
-      <button className="rounded-md bg-blue-500 text-white px-4 py-1">
-        SMS Login
+      <button
+        onClick={() => sendTransaction()}
+        className="rounded-md bg-blue-500 text-white px-4 py-1"
+      >
+        Send Transaction
       </button>
     </div>
   )
