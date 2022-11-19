@@ -103,7 +103,7 @@ const Wallet = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 border-2 p-4">
       <h1 className="text-center text-2xl mb-4">Magic Wallet</h1>
       {loggedIn ? (
         <span onClick={() => logout()}>Logout</span>

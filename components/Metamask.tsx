@@ -62,7 +62,7 @@ const Metamask = () => {
   }
 
   return (
-    <div className="space-y-6 mt-10">
+    <div className="space-y-6 mt-10 border-2 p-4">
       <h1 className="text-center text-2xl mb-4">Metamask Wallet</h1>
 
       <button
