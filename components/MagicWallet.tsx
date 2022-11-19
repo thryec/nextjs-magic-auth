@@ -5,17 +5,30 @@ import { useEffect, useState } from 'react'
 const Wallet = () => {
   const [magic, setMagic] = useState<any>()
   const [magicProvider, setMagicProvider] = useState<any>()
+  const [magicSigner, setMagicSigner] = useState<any>()
+  const [magicAddress, setMagicAddress] = useState<any>()
+  const [magicBalance, setMagicBalance] = useState<any>()
   const [loggedIn, setLoggedIn] = useState<boolean>(false)
   const [signature, setSignature] = useState<string>()
 
-  useEffect(() => {
-    const magic = new Magic('pk_live_13D0E3B027EC589E')
+  const initiateProvider = async () => {
+    const magic = new Magic('pk_live_13D0E3B027EC589E', {
+      network: 'goerli',
+    })
     const provider = new ethers.providers.Web3Provider(
       magic?.rpcProvider as any
     )
+    const signer = await provider.getSigner()
+    const address = await signer.getAddress()
+    const balance = ethers.utils.formatEther(
+      await provider.getBalance(address) // Balance is in wei
+    )
+    setMagicAddress(address)
     setMagic(magic)
     setMagicProvider(provider)
-  }, [])
+    setMagicSigner(signer)
+    setMagicBalance(balance)
+  }
 
   const checkStatus = async () => {
     try {
@@ -38,6 +51,10 @@ const Wallet = () => {
   }
 
   useEffect(() => {
+    initiateProvider()
+  }, [])
+
+  useEffect(() => {
     checkStatus()
   }, [magic])
 
@@ -53,29 +70,35 @@ const Wallet = () => {
   }
 
   const signMessage = async () => {
-    try {
-      console.log('signing...')
-      const signer = await magicProvider.getSigner()
-      const msg = 'hello world'
-      let signature = await signer.signMessage(msg)
-      setSignature(signature)
-      console.log('signature', signature)
-    } catch (err) {
-      console.error('error signing message: ', err)
+    if (magicProvider) {
+      try {
+        console.log('signing...')
+        const msg = 'hello world'
+        let signature = await magicSigner.signMessage(msg)
+        setSignature(signature)
+        console.log('signature', signature)
+      } catch (err) {
+        console.error('error signing message: ', err)
+      }
+    } else {
+      alert('Please connect Magic wallet')
     }
   }
 
   const sendEther = async () => {
-    try {
-      const signer = await magicProvider.getSigner()
-      console.log('wei: ', ethers.utils.parseEther('0.01'))
-      const tx = await signer.sendTransaction({
-        to: '0x4C36B84b2974604e0fEA458198F30864a70481E0',
-        value: ethers.utils.parseEther('0.01'),
-      })
-      console.log('send eth txn: ', tx)
-    } catch (err) {
-      console.error('error sending transaction: ', err)
+    if (magicProvider) {
+      try {
+        console.log('wei: ', ethers.utils.parseEther('0.01'))
+        const tx = await magicSigner.sendTransaction({
+          to: '0x3eb9c5B92Cb655f2769b5718D33f72E23B807D24',
+          value: ethers.utils.parseEther('0.01'),
+        })
+        console.log('send eth txn: ', tx)
+      } catch (err) {
+        console.error('error sending transaction: ', err)
+      }
+    } else {
+      alert('Please connect Magic wallet')
     }
   }
 
@@ -98,6 +121,8 @@ const Wallet = () => {
         >
           Email Login
         </button>
+        {magicAddress && <div>{magicAddress}</div>}
+        {magicBalance && <div>{magicBalance}</div>}
       </div>
       <div>
         <input
