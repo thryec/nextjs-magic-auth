@@ -68,7 +68,6 @@ const Wallet = () => {
   const sendEther = async () => {
     try {
       const signer = await magicProvider.getSigner()
-
       console.log('wei: ', ethers.utils.parseEther('0.01'))
       const tx = await signer.sendTransaction({
         to: '0x4C36B84b2974604e0fEA458198F30864a70481E0',
