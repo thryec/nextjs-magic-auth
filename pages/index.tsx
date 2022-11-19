@@ -1,10 +1,12 @@
-import Wallet from '../components/Wallet'
+import MagicWallet from '../components/MagicWallet'
+import Metamask from '../components/Metamask'
 
 const Home = () => {
   return (
     <div className="flex justify-center">
       <div className="mt-20">
-        <Wallet />
+        <MagicWallet />
+        <Metamask />
       </div>
     </div>
   )

@@ -1,11 +1,10 @@
 import { Magic } from 'magic-sdk'
 import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
-import { spawn } from 'child_process'
 
 const Wallet = () => {
   const [magic, setMagic] = useState<any>()
-  const [provider, setProvider] = useState<any>()
+  const [magicProvider, setMagicProvider] = useState<any>()
   const [loggedIn, setLoggedIn] = useState<boolean>(false)
   const [signature, setSignature] = useState<string>()
 
@@ -15,7 +14,7 @@ const Wallet = () => {
       magic?.rpcProvider as any
     )
     setMagic(magic)
-    setProvider(provider)
+    setMagicProvider(provider)
   }, [])
 
   const checkStatus = async () => {
@@ -31,7 +30,7 @@ const Wallet = () => {
   const logout = async () => {
     try {
       await magic.user.logout()
-      console.log('user logout status:', await magic.user.isLoggedIn()) // => `false`
+      console.log('user logout status:', await magic.user.isLoggedIn())
       setLoggedIn(await magic.user.isLoggedIn())
     } catch {
       console.log('error logging out')
@@ -53,24 +52,31 @@ const Wallet = () => {
     }
   }
 
-  const sendTransaction = async () => {
-    const signer = await provider.getSigner()
-    const tx = signer.sendTransaction({
-      to: '0x4C36B84b2974604e0fEA458198F30864a70481E0',
-      value: ethers.utils.parseEther('0.01'),
-    })
-  }
-
   const signMessage = async () => {
     try {
       console.log('signing...')
-      const signer = await provider.getSigner()
+      const signer = await magicProvider.getSigner()
       const msg = 'hello world'
       let signature = await signer.signMessage(msg)
       setSignature(signature)
       console.log('signature', signature)
     } catch (err) {
-      console.log('error: ', err)
+      console.error('error signing message: ', err)
+    }
+  }
+
+  const sendEther = async () => {
+    try {
+      const signer = await magicProvider.getSigner()
+
+      console.log('wei: ', ethers.utils.parseEther('0.01'))
+      const tx = await signer.sendTransaction({
+        to: '0x4C36B84b2974604e0fEA458198F30864a70481E0',
+        value: ethers.utils.parseEther('0.01'),
+      })
+      console.log('send eth txn: ', tx)
+    } catch (err) {
+      console.error('error sending transaction: ', err)
     }
   }
 
@@ -110,11 +116,11 @@ const Wallet = () => {
         >
           Sign Message
         </button>
-        {signature && <span className="block">{signature}</span>}
+        {signature && <div className="block w-1/3">{signature}</div>}
       </div>
 
       <button
-        onClick={() => sendTransaction()}
+        onClick={() => sendEther()}
         className="rounded-md bg-blue-500 text-white px-4 py-1"
       >
         Send Transaction
