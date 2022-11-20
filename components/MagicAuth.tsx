@@ -126,15 +126,6 @@ const Wallet = () => {
         {magicBalance && <div>{magicBalance}</div>}
       </div>
       <div>
-        <input
-          type="text"
-          className="border-2 block mb-2 rounded-md px-2 py-1"
-        />
-        <button className="rounded-md bg-blue-500 text-white px-4 py-1">
-          SMS Login
-        </button>
-      </div>
-      <div>
         <button
           onClick={() => signMessage()}
           className="rounded-md bg-blue-500 text-white px-4 py-1"
@@ -148,7 +139,7 @@ const Wallet = () => {
         onClick={() => sendEther()}
         className="rounded-md bg-blue-500 text-white px-4 py-1"
       >
-        Send Transaction
+        Send Ether
       </button>
     </div>
   )
