@@ -23,6 +23,7 @@ const Wallet = () => {
     const balance = ethers.utils.formatEther(
       await provider.getBalance(address) // Balance is in wei
     )
+
     setMagicAddress(address)
     setMagic(magic)
     setMagicProvider(provider)
